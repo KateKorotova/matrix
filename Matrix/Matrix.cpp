@@ -1,14 +1,16 @@
 #include "Matrix.h"
-#include <string>
 #include <iostream>
-
 
 
 int main()
 {
 	Matrix<int> a;
+	Matrix<int> b;
 	cin >> a; 
-	cout << a; 
+	cin >> b; 
+
+	//cout << a + b << endl;
+	cout << a * b << endl; 
 	system("pause");
 	return 0;
 }
