@@ -14,6 +14,9 @@ Rational::Rational(const Rational& other) {
 Rational::Rational(double a) {
 	(*this).from_double(a);
 }
+Rational& Rational::operator =(double a) {
+	return from_double(a);
+}
 
 Rational::Rational(long long ch, long long zn, int sign) {
 	(*this).zn = zn;
@@ -168,6 +171,31 @@ Rational Rational::operator /(const Rational& b){
 bool Rational::operator ==(const Rational& b) {
 	return ((*this).zn == b.zn && (*this).ch == b.ch && (*this).sign == b.sign);
 }
+
+bool Rational::operator >(const Rational& b) {
+	int cmp = cmp_module(b);
+	if ((*this).zn == -1 && b.zn == -1)
+		return cmp == -1;
+	if ((*this).zn == -1 && b.zn == 1)
+		return false;
+	if ((*this).zn == 1 && b.zn == -1)
+		return true;
+	if ((*this).zn == 1 && b.zn == 1)
+		return cmp == 1;
+}
+
+bool Rational::operator <(const Rational& b) {
+	int cmp = cmp_module(b);
+	if ((*this).zn == -1 && b.zn == -1)
+		return cmp == 1;
+	if ((*this).zn == -1 && b.zn == 1)
+		return true;
+	if ((*this).zn == 1 && b.zn == -1)
+		return false;
+	if ((*this).zn == 1 && b.zn == 1)
+		return cmp == -1;
+}
+
 
 std::istream& operator >> (std::istream& os, Rational& ans) {
 	std::string num;

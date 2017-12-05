@@ -24,7 +24,10 @@ public:
 	Rational operator *(const Rational& b);
 	Rational operator /(const Rational& b);
 	Rational from_double(double num);
+	Rational& operator =(double a);
 	bool operator ==(const Rational& b);
+	bool operator >(const Rational& b);
+	bool operator <(const Rational& b);
 	operator double();
 	friend std::istream& operator >> (std::istream& os, Rational& ans);
 	friend std::ostream& operator<< (std::ostream& os, const Rational& num);

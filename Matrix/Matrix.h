@@ -73,6 +73,8 @@ public:
 			throw exception("Matrices can`t be multiplied");
 	}
 
+
+
 	friend istream& operator >> (istream& os, Matrix<T>& a) {
 		cout << "Enter the number of rows and columns in the matrix" << endl;
 		cin >> a.rowCount >> a.colCount;
@@ -104,4 +106,63 @@ public:
 		return os;
 	}
 
+	friend Matrix<T> Gaussian(const Matrix<T> &a, const Matrix<T>& b) {
+		if (a.rowCount != a.colCount)
+			throw exception("First matrix is not square.");
+		if (!(b.rowCount == a.rowCount && b.colCount==1))
+			throw exception("Second vector must be colomn and have equal element count as first.");
+
+		int n = a.rowCount;
+
+		Matrix<T> matrix(n, n + 1);
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				matrix.arr[i][j] = a.arr[i][j];
+			}
+		}
+		for (int i = 0; i < n; i++) {
+			matrix.arr[i][n] = b.arr[i][0];
+		}
+
+		for (int i = 0; i<n; i++) {
+			// Search for maximum in this column
+			double maxEl = abs(double(matrix.arr[i][i]));
+			int maxRow = i;
+			for (int k = i + 1; k<n; k++) {
+				if (abs(double(matrix.arr[k][i])) > maxEl) {
+					maxEl = abs(double(matrix.arr[k][i]));
+					maxRow = k;
+				}
+			}
+
+			// Swap maximum row with current row (column by column)
+			for (int k = i; k<n + 1; k++) {
+				double tmp = matrix.arr[maxRow][k];
+				matrix.arr[maxRow][k] = matrix.arr[i][k];
+				matrix.arr[i][k] = tmp;
+			}
+
+			// Make all rows below this one 0 in current column
+			for (int k = i + 1; k<n; k++) {
+				T c = -matrix.arr[k][i] / matrix.arr[i][i];
+				for (int j = i; j<n + 1; j++) {
+					if (i == j) {
+						matrix.arr[k][j] = 0;
+					}
+					else {
+						matrix.arr[k][j] = matrix.arr[k][j] + c * matrix.arr[i][j];
+					}
+				}
+			}
+		}
+
+		Matrix<T> x(n, 1);
+		for (int i = n - 1; i >= 0; i--) {
+			x.arr[i][0] = matrix.arr[i][n] / matrix.arr[i][i];
+			for (int k = i - 1; k >= 0; k--) {
+				matrix.arr[k][n] = matrix.arr[k][n] - matrix.arr[k][i] * x.arr[i][0];
+			}
+		}
+		return x;
+	}
 };
