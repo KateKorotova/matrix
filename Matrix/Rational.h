@@ -32,4 +32,5 @@ public:
 	friend std::istream& operator >> (std::istream& os, Rational& ans);
 	friend std::ostream& operator<< (std::ostream& os, const Rational& num);
 	friend Rational pow_(Rational& a, int num);
+	friend Rational abs(Rational& a);
 };

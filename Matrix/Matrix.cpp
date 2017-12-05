@@ -25,9 +25,9 @@ int main()
 	//cout << res2 << endl;
 	Matrix<Rational> a;
 	Matrix<Rational> b;
-	cin >> a; 
-	cin >> b; 
-	cout << Gaussian(a,b);
+	cin >> a;
+	cin >> b;
+	cout << Gaussian(a, b) << endl;
 	system("pause");
 	return 0;
 }

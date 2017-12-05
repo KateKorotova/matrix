@@ -74,6 +74,66 @@ public:
 	}
 
 
+	Matrix<Rational> operator ~() {		
+		if (rowCount != colCount)
+			throw exception("Impossible");
+		int n = rowCount;
+		Matrix <double> A(n,2*n);
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				A.arr[i][j] = double((*this).arr[i][j]);
+			}
+		}
+		for (int i = 0; i < n; i++)
+			A.arr[i][n + i] = 1;
+
+		for (int i = 0; i < n; i++) {
+			double maxEl = abs(A.arr[i][i]);
+			int maxRow = i;
+			for (int k = i + 1; k<n; k++) {
+				if (abs(A.arr[k][i]) > maxEl) {
+					maxEl = abs(A.arr[k][i]);
+					maxRow = k;
+				}
+			}			
+			swap(A.arr[i], A.arr[maxRow]);
+
+			for (int j = i+1; j < 2*n; j++) {
+				A.arr[i][j] = A.arr[i][j] / A.arr[i][i];
+			}			
+			A.arr[i][i] = 1;
+
+			for (int k = i + 1; k < n; k++) {
+				double c = -A.arr[k][i];
+				for (int j = i; j < 2*n; j++) {
+					if (i == j) {
+						A.arr[k][j] = 0;
+					}
+					else {
+						A.arr[k][j] = A.arr[k][j] + c * A.arr[i][j];
+					}
+				}
+			}
+		}
+
+		// triangle
+		for (int i = n - 1; i > 0; i--) {
+			for (int k = i - 1; k >= 0; k--) {
+				double c = -A.arr[k][i];
+				A.arr[k][i] = 0;
+				for (int j = n; j < 2*n; j++)
+					A.arr[k][j] = A.arr[k][j] + c * A.arr[i][j];
+			}
+		}
+		Matrix<Rational> res(n,n);
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				res.arr[i][j] = Rational(A.arr[i][n + j]);
+			}
+		}
+		return res;
+	}
+
 
 	friend istream& operator >> (istream& os, Matrix<T>& a) {
 		cout << "Enter the number of rows and columns in the matrix" << endl;
@@ -106,7 +166,7 @@ public:
 		return os;
 	}
 
-	friend Matrix<T> Gaussian(const Matrix<T> &a, const Matrix<T>& b) {
+	friend Matrix<T> Gaussian(Matrix<T> a, Matrix<T> b) {
 		if (a.rowCount != a.colCount)
 			throw exception("First matrix is not square.");
 		if (!(b.rowCount == a.rowCount && b.colCount==1))
@@ -114,38 +174,34 @@ public:
 
 		int n = a.rowCount;
 
-		Matrix<T> matrix(n, n + 1);
+		Matrix<double> matrix(n, n + 1);
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
-				matrix.arr[i][j] = a.arr[i][j];
+				matrix.arr[i][j] = double(a.arr[i][j]);
 			}
 		}
 		for (int i = 0; i < n; i++) {
-			matrix.arr[i][n] = b.arr[i][0];
+			matrix.arr[i][n] = double(b.arr[i][0]);
 		}
 
 		for (int i = 0; i<n; i++) {
 			// Search for maximum in this column
-			double maxEl = abs(double(matrix.arr[i][i]));
+			double maxEl = abs(matrix.arr[i][i]);
 			int maxRow = i;
 			for (int k = i + 1; k<n; k++) {
-				if (abs(double(matrix.arr[k][i])) > maxEl) {
-					maxEl = abs(double(matrix.arr[k][i]));
+				if (abs(matrix.arr[k][i]) > maxEl) {
+					maxEl = abs(matrix.arr[k][i]);
 					maxRow = k;
 				}
 			}
 
 			// Swap maximum row with current row (column by column)
-			for (int k = i; k<n + 1; k++) {
-				double tmp = matrix.arr[maxRow][k];
-				matrix.arr[maxRow][k] = matrix.arr[i][k];
-				matrix.arr[i][k] = tmp;
-			}
+			swap(matrix.arr[i], matrix.arr[maxRow]);
 
 			// Make all rows below this one 0 in current column
-			for (int k = i + 1; k<n; k++) {
-				T c = -matrix.arr[k][i] / matrix.arr[i][i];
-				for (int j = i; j<n + 1; j++) {
+			for (int k = i + 1; k < n; k++) {
+				double c = -double(matrix.arr[k][i]) / double(matrix.arr[i][i]);
+				for (int j = i; j < n + 1; j++) {
 					if (i == j) {
 						matrix.arr[k][j] = 0;
 					}
@@ -156,13 +212,16 @@ public:
 			}
 		}
 
-		Matrix<T> x(n, 1);
+		Matrix<double> x(n, 1);
 		for (int i = n - 1; i >= 0; i--) {
 			x.arr[i][0] = matrix.arr[i][n] / matrix.arr[i][i];
 			for (int k = i - 1; k >= 0; k--) {
 				matrix.arr[k][n] = matrix.arr[k][n] - matrix.arr[k][i] * x.arr[i][0];
 			}
 		}
-		return x;
+		Matrix<T> ans(n, 1);
+		for (int i = 0; i < n; i++)
+			ans.arr[i][0] = T(x.arr[i][0]);
+		return ans;
 	}
 };

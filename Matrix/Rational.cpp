@@ -64,7 +64,12 @@ Rational::operator double() {
 }
 
 Rational Rational::from_double(double n) {
+	int znak = 1;
 	std::string num = std::to_string(n);
+	if (num[0] == '-') {
+		znak = -1;
+		num = num.erase(0, 1);
+	}
 	std::string a = num.substr(0, num.find("."));
 	long long f = atoi(a.c_str());
 	num.erase(0, num.find(".")+1);
@@ -81,6 +86,7 @@ Rational Rational::from_double(double n) {
 	int k = zn; 
 	ch = ch + (k*f);
 	(*this).reduction();
+	(*this).sign = znak;
 	return (*this);
 }
 
@@ -118,6 +124,7 @@ int Rational::cmp_module(const Rational& b) {
 		return 0;
 	if (cmp1 < cmp2)
 		return -1;
+	return 0;
 }
 
 Rational Rational::operator +(const Rational& b) {
@@ -182,6 +189,7 @@ bool Rational::operator >(const Rational& b) {
 		return true;
 	if ((*this).zn == 1 && b.zn == 1)
 		return cmp == 1;
+	return true;
 }
 
 bool Rational::operator <(const Rational& b) {
@@ -194,6 +202,7 @@ bool Rational::operator <(const Rational& b) {
 		return false;
 	if ((*this).zn == 1 && b.zn == 1)
 		return cmp == -1;
+	return true;
 }
 
 
@@ -242,6 +251,11 @@ Rational pow_(Rational& a, int num) {
 	return a;
 }
 
+Rational abs(Rational& a) {
+	Rational b(a);
+	b.zn = 1;
+	return b;
+}
 
 
 
